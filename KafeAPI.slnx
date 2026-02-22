@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="Core/KafeAPI.Domain/KafeAPI.Domain.csproj" />
+    <Project Path="KafeAPI.Application/KafeAPI.Application.csproj" />
+  </Folder>
+  <Folder Name="/Infastructure/">
+    <Project Path="Infastructure/KafeAPI.Persistence/KafeAPI.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/Presentation/">
+    <Project Path="Presentation/KafeAPI.API/KafeAPI.API.csproj" Id="8c2e2144-18fb-47ee-987e-1f89ec70f897" />
+  </Folder>
+</Solution>
