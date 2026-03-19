@@ -36,13 +36,13 @@ namespace KafeAPI.Application.Services.Concrete
                 if (!validate.IsValid)
                 {
 
-                    return new ResponseDto<object> { Success = false, Data = null, Message = string.Join(",", validate.Errors.Select(x => x.ErrorMessage)), ErrorCodes = ErrorCodes.ValidationError };
+                    return new ResponseDto<object> { Success = false, Data = null, Message = string.Join(",", validate.Errors.Select(x => x.ErrorMessage)), ErrorCode = ErrorCodes.ValidationError };
                 }
-                var checkTable = await _tableRepository.GetByIdAsync(dto.TableNumber);
+                var checkTable = await _tableRepository1.GetByTableNumberAsync(dto.TableNumber);
                 if (checkTable != null)
                 {
 
-                    return new ResponseDto<object> { Success = false, Data = null, Message = "Eklemek istediginiz masa numarası mevcuttur.", ErrorCodes = ErrorCodes.DuplicateError };
+                    return new ResponseDto<object> { Success = false, Data = null, Message = "Eklemek istediginiz masa numarası mevcuttur.", ErrorCode = ErrorCodes.DuplicateError };
 
                 }
                 var result = _mapper.Map<Table>(dto);
@@ -51,7 +51,7 @@ namespace KafeAPI.Application.Services.Concrete
             }
             catch (Exception ex)
             {
-                return new ResponseDto<object> { Success = false, Data = null, Message = "Bir Hata oluştu", ErrorCodes = ErrorCodes.Exception };
+                return new ResponseDto<object> { Success = false, Data = null, Message = "Bir Hata oluştu", ErrorCode = ErrorCodes.Exception };
 
             }
         }
@@ -63,16 +63,55 @@ namespace KafeAPI.Application.Services.Concrete
                 var rp = await _tableRepository.GetByIdAsync(id);
                 if (rp == null)
                 {
-                    return new ResponseDto<object> { Success = false, Data = null, Message = "Masa bulunamadı.", ErrorCodes = ErrorCodes.NotFound };
+                    return new ResponseDto<object> { Success = false, Data = null, Message = "Masa bulunamadı.", ErrorCode = ErrorCodes.NotFound };
                 }
                 await _tableRepository.DeleteAsync(rp);
                 return new ResponseDto<object> { Success = true, Data = null, Message = "Masa basarili bir sekilde silindi." };
             }
             catch (Exception ex)
             {
-                return new ResponseDto<object> { Success = false, Data = null, Message = "Bir hata olustu.", ErrorCodes = ErrorCodes.Exception };
+                return new ResponseDto<object> { Success = false, Data = null, Message = "Bir hata olustu.", ErrorCode = ErrorCodes.Exception };
            
             
+            }
+        }
+
+        public async Task<ResponseDto<List<ResultTableDto>>> GetAllActiveTablesGeneric()
+        {
+            try {
+                var rp = await _tableRepository.GetAllAsync();
+                rp=rp.Where(x => x.IsActive == true).ToList();
+                if (rp.Count() == 0)
+                {
+                    return new ResponseDto<List<ResultTableDto>> { Success = false, Data = null, Message = "Masalar Bulunamadi.", ErrorCode = ErrorCodes.NotFound };
+                }
+                var result = _mapper.Map<List<ResultTableDto>>(rp);
+                return new ResponseDto<List<ResultTableDto>> { Success = true, Data = result };
+
+            }
+            catch(Exception ex)
+            {
+                return new ResponseDto<List<ResultTableDto>> { Success = false, Data = null, Message = "Bir sorun oluştu.", ErrorCode = ErrorCodes.Exception };
+            }
+        }
+
+        public async Task<ResponseDto<List<ResultTableDto>>> GetAllActiveTables()
+        {
+
+            try
+            {
+                var rp = await _tableRepository1.GetAllActiveTablesAsync();
+                if (rp.Count() == 0)
+                {
+                    return new ResponseDto<List<ResultTableDto>> { Success = false, Data = null, Message = "Masalar Bulunamadi.", ErrorCode = ErrorCodes.NotFound };
+                }
+                var result = _mapper.Map<List<ResultTableDto>>(rp);
+                return new ResponseDto<List<ResultTableDto>> { Success = true, Data = result };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDto<List<ResultTableDto>> { Success = false, Data = null, Message = "Bir sorun oluştu.", ErrorCode = ErrorCodes.Exception };
             }
         }
 
@@ -83,7 +122,7 @@ namespace KafeAPI.Application.Services.Concrete
                 var rp = await _tableRepository.GetAllAsync();
                 if (rp.Count() == 0)
                 {
-                    return new ResponseDto<List<ResultTableDto>> { Success = false, Data = null, Message = "Masalar Bulunamadi.", ErrorCodes = ErrorCodes.NotFound };
+                    return new ResponseDto<List<ResultTableDto>> { Success = false, Data = null, Message = "Masalar Bulunamadi.", ErrorCode = ErrorCodes.NotFound };
                 }
                 var result = _mapper.Map<List<ResultTableDto>>(rp);
                 return new ResponseDto<List<ResultTableDto>> { Success = true, Data = result };
@@ -91,7 +130,7 @@ namespace KafeAPI.Application.Services.Concrete
             catch (Exception ex)
             {
 
-                return new ResponseDto<List<ResultTableDto>>() { Success = false, Data = null, Message = "Bir sorun oluştu.", ErrorCodes = ErrorCodes.Exception };
+                return new ResponseDto<List<ResultTableDto>>() { Success = false, Data = null, Message = "Bir sorun oluştu.", ErrorCode = ErrorCodes.Exception };
             }
         }
 
@@ -102,7 +141,7 @@ namespace KafeAPI.Application.Services.Concrete
                 var rp = await _tableRepository.GetByIdAsync(id);
                 if (rp == null)
                 {
-                    return new ResponseDto<DetailTableDto> { Success = false, Data = null, Message = "Masa bulunamadı", ErrorCodes = ErrorCodes.NotFound };
+                    return new ResponseDto<DetailTableDto> { Success = false, Data = null, Message = "Masa bulunamadı", ErrorCode = ErrorCodes.NotFound };
 
                 }
                 var result = _mapper.Map<DetailTableDto>(rp);
@@ -112,7 +151,7 @@ namespace KafeAPI.Application.Services.Concrete
             catch (Exception ex)
             {
 
-                return new ResponseDto<DetailTableDto> { Success = false, Data = null, Message = "Bir hata olustu.", ErrorCodes = ErrorCodes.Exception };
+                return new ResponseDto<DetailTableDto> { Success = false, Data = null, Message = "Bir hata olustu.", ErrorCode = ErrorCodes.Exception };
 
             }
         }
@@ -123,7 +162,7 @@ namespace KafeAPI.Application.Services.Concrete
                 var table =await _tableRepository1.GetByTableNumberAsync(tableNumber);
                 if(table == null)
                 {
-                    return new ResponseDto<DetailTableDto> { Success = false, Data = null, Message = "Masa bulunamadı", ErrorCodes = ErrorCodes.NotFound };
+                    return new ResponseDto<DetailTableDto> { Success = false, Data = null, Message = "Masa bulunamadı", ErrorCode = ErrorCodes.NotFound };
                     
                 }
                 var result = _mapper.Map<DetailTableDto>(table);
@@ -131,7 +170,7 @@ namespace KafeAPI.Application.Services.Concrete
             }
             catch (Exception ex)
             {
-                return new ResponseDto<DetailTableDto> { Success = false, Data = null, Message = "Bir hata olustu.", ErrorCodes = ErrorCodes.Exception };
+                return new ResponseDto<DetailTableDto> { Success = false, Data = null, Message = "Bir hata olustu.", ErrorCode = ErrorCodes.Exception };
             }
         }
 
@@ -142,12 +181,12 @@ namespace KafeAPI.Application.Services.Concrete
                 var validate = await _updateTableValidator.ValidateAsync(dto);
                 if (!validate.IsValid)
                 {
-                    return new ResponseDto<object> { Success = false, Data = null, Message = string.Join(",", validate.Errors.Select(x => x.ErrorMessage)), ErrorCodes = ErrorCodes.ValidationError };
+                    return new ResponseDto<object> { Success = false, Data = null, Message = string.Join(",", validate.Errors.Select(x => x.ErrorMessage)), ErrorCode = ErrorCodes.ValidationError };
                 }
                 var rp = await _tableRepository.GetByIdAsync(dto.Id);
                 if(rp == null)
                 {
-                    return new ResponseDto<object> { Success = false, Data = null, Message = "Masa bulunamadı.", ErrorCodes = ErrorCodes.NotFound };
+                    return new ResponseDto<object> { Success = false, Data = null, Message = "Masa bulunamadı.", ErrorCode = ErrorCodes.NotFound };
                 }
                 var result = _mapper.Map(dto, rp);
                 await _tableRepository.UpdateAsync(result);
@@ -155,8 +194,49 @@ namespace KafeAPI.Application.Services.Concrete
             }
             catch (Exception ex)
             {
-                return new ResponseDto<object> { Success = false, Data = null, Message = "Bir hata olustu.", ErrorCodes = ErrorCodes.Exception };
+                return new ResponseDto<object> { Success = false, Data = null, Message = "Bir hata olustu.", ErrorCode = ErrorCodes.Exception };
                 
+            }
+        }
+
+        public async Task<ResponseDto<object>> UpdateTableStatusByTableNumber(int tableNumber)
+        {
+            try
+            {
+                var rp = await _tableRepository1.GetByTableNumberAsync(tableNumber);
+                if (rp == null)
+                {
+                    return new ResponseDto<object> { Success = false, Data = null, Message = "Masa bulunamadı.", ErrorCode = ErrorCodes.NotFound };
+                }
+                rp.IsActive = !rp.IsActive;
+                await _tableRepository.UpdateAsync(rp);
+                return new ResponseDto<object> { Success = true, Data = null, Message = "Masa basarili bir sekilde guncellendi." };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDto<object> { Success = false, Data = null, Message = "Bir hata olustu.", ErrorCode = ErrorCodes.Exception };
+
+            }
+        }
+
+        public async Task<ResponseDto<object>> UpdateTableStatusById(int id)
+        {
+            
+             try
+            {
+                var rp = await _tableRepository.GetByIdAsync(id);
+                if (rp == null)
+                {
+                    return new ResponseDto<object> { Success = false, Data = null, Message = "Masa bulunamadı.", ErrorCode = ErrorCodes.NotFound };
+                }
+                rp.IsActive = !rp.IsActive;
+                await _tableRepository.UpdateAsync(rp);
+                return new ResponseDto<object> { Success = true, Data = null, Message = "Masa basarili bir sekilde guncellendi." };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDto<object> { Success = false, Data = null, Message = "Bir hata olustu.", ErrorCode = ErrorCodes.Exception };
+
             }
         }
     }

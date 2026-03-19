@@ -1,6 +1,7 @@
 ﻿using KafeAPI.Application.Dtos.CategoryDtos;
 using KafeAPI.Application.Dtos.ResponseDtos;
 using KafeAPI.Application.Services.Abstract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,103 +9,67 @@ namespace KafeAPI.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class CategoriesController : BaseController
     {
         private readonly ICategoryServices _categoryServices;
 
         public CategoriesController(ICategoryServices categoryServices)
         {
             _categoryServices = categoryServices;
-            
+
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllCategories() { 
-        var result =await _categoryServices.GetAllCategories();
-            if (!result.Success)
-            {
-                if (result.ErrorCodes == ErrorCodes.NotFound)
-                {
-                    return Ok(result);
-                }
-                return BadRequest(result);
+        public async Task<IActionResult> GetAllCategories()
+        {
+            var result = await _categoryServices.GetAllCategories();
 
-            }
-
-            return Ok(result);
+            return CreateResponse(result);
 
         }
 
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdCategories(int id) {
-        
+        public async Task<IActionResult> GetByIdCategories(int id)
+        {
+
             var result = await _categoryServices.GetByIdCategory(id);
-            if (!result.Success)
-            {
+            return CreateResponse(result);
 
-                if(result.ErrorCodes == ErrorCodes.NotFound)
-                {
-                    return Ok();
-                }
-                return BadRequest(result);
-            }
-            return Ok(result);
-        
-        
+
+
         }
-
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddCategory(CreateCategoryDto dto)
         {
-           var result= await _categoryServices.AddCategory(dto);
-            if (!result.Success)
-            {
-                if (result.ErrorCodes == ErrorCodes.ValidationError ) {
-                    return Ok(result);
-                
-                }
-                return BadRequest();
-
-            }
-     
-            return Ok(result);
+            var result = await _categoryServices.AddCategory(dto);
+            return CreateResponse(result);
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateCategory(UpdateCategoryDto dto)
         {
-            var result=await _categoryServices.UpdateCategory(dto);
+            var result = await _categoryServices.UpdateCategory(dto);
 
-
-            if (!result.Success)
-            {
-                if (result?.ErrorCodes == ErrorCodes.NotFound || result?.ErrorCodes == ErrorCodes.ValidationError) 
-                {
-                    return Ok(result);
-                }
-                return BadRequest(result);
-
-            }
-            return Ok(result);
+            return CreateResponse(result);
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-           var result= await _categoryServices.DeleteCategory(id);
+            var result = await _categoryServices.DeleteCategory(id);
 
-            if (!result.Success) { 
-            
-                if(result.ErrorCodes == ErrorCodes.NotFound)
-                {
-                    return Ok(result);
-                }
-                return BadRequest(result);
-            }
-            return Ok("Kategori Silindi");
+            return CreateResponse(result);
         }
 
+        [HttpGet("GetAllCategoriesWithMenuItems")]
+        public async Task<IActionResult> GetAllCategoriesWithMenuItems()
+        {
+            var result = await _categoryServices.GetCategoriesWithMenuItem();
+            return CreateResponse(result);
 
+
+        }
     }
 }

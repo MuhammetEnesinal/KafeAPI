@@ -19,6 +19,12 @@ namespace KafeAPI.Persistence.Repository
             _context = context;
         }
 
+        public async Task<List<Table>> GetAllActiveTablesAsync()
+        {
+            var result = await _context.Tables.Where(t => t.IsActive).ToListAsync();
+            return result;
+        }
+
         public async Task<Table> GetByTableNumberAsync(int tableNumber)
         {
             var result = await _context.Tables.FirstOrDefaultAsync(t => t.TableNumber == tableNumber);

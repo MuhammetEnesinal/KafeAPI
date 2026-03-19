@@ -42,6 +42,11 @@ namespace KafeAPI.Persistence.Repository
             return result;
         }
 
+        public Task GetByTableNumberAsync(int tableNumber)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task UpdateAsync(T entity)
         {
             _context.Set<T>().Update(entity);
