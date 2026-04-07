@@ -21,6 +21,47 @@ namespace KafeAPI.Application.Services.Concrete
             _registerValidator = registerValidator;
         }
 
+        public async Task<ResponseDto<object>> AddToRole(string email, string roleName)
+        {
+            try
+            {
+               var result=await _userRepository.AddRoleToUserAsync(email, roleName);
+                if(result)
+                {
+                    return new ResponseDto<object> { Success = true, Data = null, Message = "Kullanıcı role eklendi."};
+                }
+                return new ResponseDto<object> { Success = false, Data = null, Message = "Kullanıcı role eklenemedi.", ErrorCode = ErrorCodes.BadRequest };
+
+
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDto<object> { Success = false, Data = null, Message = "Bir Hata oluştu.", ErrorCode = ErrorCodes.Exception };
+            }
+        }
+
+        public async Task<ResponseDto<object>> CreateRole(string roleName)
+        {
+            try
+            {
+                var result =await _userRepository.CreateRoleAsync(roleName);
+                
+                if(result)
+                {
+                  return new ResponseDto<object> { Success = true, Data = null, Message = "Rol oluşturuldu."};
+
+                }
+                
+                  return new ResponseDto<object> { Success = false, Data = null, Message = "Rol oluşturulamadı.", ErrorCode = ErrorCodes.BadRequest };
+                
+            
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDto<object> { Success = false, Data = null, Message = "Bir Hata oluştu.", ErrorCode = ErrorCodes.Exception };
+            }
+        }
+
         public async Task<ResponseDto<object>> Register(RegisterDto dto)
         {
             try
@@ -43,7 +84,7 @@ namespace KafeAPI.Application.Services.Concrete
 
                 }
             }
-            catch
+            catch(Exception ex)
             {
                 return new ResponseDto<object> { Success = false, Data = null, Message = "Bir Hata oluştu.", ErrorCode = ErrorCodes.Exception };
             }

@@ -19,5 +19,11 @@ namespace KafeAPI.Application.Interfaces
 
         Task<SignInResult> CheckUserWithPassword(LoginDto dto);
 
+        Task<bool> CreateRoleAsync(string roleName);
+
+        Task<bool> AddRoleToUserAsync(string email, string roleName);
+
+
+
     }
 }

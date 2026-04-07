@@ -1,12 +1,13 @@
 ﻿using KafeAPI.Application.Dtos.ResponseDtos;
 using KafeAPI.Application.Dtos.TableDtos;
 using KafeAPI.Application.Services.Abstract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KafeAPI.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/tables")]
     [ApiController]
     public class TablesController : BaseController
     {
@@ -17,6 +18,7 @@ namespace KafeAPI.API.Controllers
             _tableServices = tableServices;
         }
 
+        [Authorize(Roles = "admin,employe")]
         [HttpGet]
         public async Task<IActionResult> GetAllTables()
         {
@@ -25,6 +27,7 @@ namespace KafeAPI.API.Controllers
             
         }
 
+        [Authorize(Roles = "admin,employe")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdTable(int id)
         {
@@ -32,14 +35,16 @@ namespace KafeAPI.API.Controllers
             return CreateResponse(result);
         }
 
-        [HttpGet("getbytablenumber")]
-        public async Task<IActionResult> GetByTableNumber(int tableNumber)
+        [Authorize(Roles = "admin,employe")]
+        [HttpGet("tablenumber")]
+        public async Task<IActionResult> GetByTableNumber([FromQuery]int tableNumber)
         {
             var result = await _tableServices.GetByTableNumber(tableNumber);
             return CreateResponse(result);
 
         }
 
+        [Authorize(Roles = "admin,employe")]
         [HttpPost]
         public async Task<IActionResult> AddTables(CreateTableDto dto)
         {
@@ -47,7 +52,7 @@ namespace KafeAPI.API.Controllers
             return CreateResponse(result);
         }
 
-
+        [Authorize(Roles = "admin,employe")]
         [HttpPut]
         public async Task<IActionResult> UpdateTable(UpdateTableDto dto)
         {
@@ -56,6 +61,7 @@ namespace KafeAPI.API.Controllers
             
         }
 
+        [Authorize(Roles = "admin,employe")]
         [HttpDelete]
         public async Task<IActionResult> DeleteTables(int id)
         {
@@ -63,29 +69,32 @@ namespace KafeAPI.API.Controllers
             return CreateResponse(result);
         }
 
-        [HttpGet("getallisactivetablesgeneric")]
-        public async Task<IActionResult> GetAllIsActiveTablesGeneric()
-        {
-            var result = await _tableServices.GetAllActiveTablesGeneric();
-            return CreateResponse(result);
-        }
+        // [Authorize(Roles = "admin,employe")]
+        // [HttpGet("isactivetables")]
+        // public async Task<IActionResult> GetAllIsActiveTablesGeneric()
+        // {
+        // var result = await _tableServices.GetAllActiveTablesGeneric();
+        //     return CreateResponse(result);
+        //  }
 
-        [HttpGet("getallisactivetables")]
+        [Authorize(Roles = "admin,employe")]
+        [HttpGet("isactivetables")]
         public async Task<IActionResult> GetAllIsActiveTables()
         {
             var result = await _tableServices.GetAllActiveTables();
             return CreateResponse(result);
         }
 
-
-        [HttpPut("updatetablestatusbyid")]
+        [Authorize(Roles = "admin,employe")]
+        [HttpPut("tablestatusbyid")]
         public async Task<IActionResult> UpdateTableStatusById(int id)
         {
             var result = await _tableServices.UpdateTableStatusById(id);
             return CreateResponse(result);
         }
 
-        [HttpPut("updatetablestatusbytablenumber")]
+        [Authorize(Roles = "admin,employe")]
+        [HttpPut("statusbytablenumber")]
         public async Task<IActionResult> UpdateTableStatusByTableNumber(int tableNumber)
         {
             var result = await _tableServices.UpdateTableStatusByTableNumber(tableNumber);

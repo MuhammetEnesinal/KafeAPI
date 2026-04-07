@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KafeAPI.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthController : BaseController
     {

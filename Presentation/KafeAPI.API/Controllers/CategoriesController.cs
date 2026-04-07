@@ -7,22 +7,28 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KafeAPI.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/categories")]
     [ApiController]
     public class CategoriesController : BaseController
     {
         private readonly ICategoryServices _categoryServices;
+        private readonly Serilog.ILogger _log;
 
-        public CategoriesController(ICategoryServices categoryServices)
+        public CategoriesController(ICategoryServices categoryServices, Serilog.ILogger log)
         {
             _categoryServices = categoryServices;
-
+            _log = log;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllCategories()
         {
+            _log.Information("get-categories");
             var result = await _categoryServices.GetAllCategories();
+            _log.Information("iget-categories:"+result.Success);
+            _log.Warning("wget-categories:" + result.Success);
+            _log.Error("eget-categories:" + result.Success);
+            _log.Debug("eget-categories:" + result.Success);
 
             return CreateResponse(result);
 
@@ -39,7 +45,7 @@ namespace KafeAPI.API.Controllers
 
 
         }
-        [Authorize]
+        [Authorize(Roles ="admin")]
         [HttpPost]
         public async Task<IActionResult> AddCategory(CreateCategoryDto dto)
         {
@@ -47,6 +53,7 @@ namespace KafeAPI.API.Controllers
             return CreateResponse(result);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPut]
         public async Task<IActionResult> UpdateCategory(UpdateCategoryDto dto)
         {
@@ -55,6 +62,7 @@ namespace KafeAPI.API.Controllers
             return CreateResponse(result);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpDelete]
         public async Task<IActionResult> DeleteCategory(int id)
         {
@@ -63,7 +71,7 @@ namespace KafeAPI.API.Controllers
             return CreateResponse(result);
         }
 
-        [HttpGet("GetAllCategoriesWithMenuItems")]
+        [HttpGet("withmewnuıtems")]
         public async Task<IActionResult> GetAllCategoriesWithMenuItems()
         {
             var result = await _categoryServices.GetCategoriesWithMenuItem();

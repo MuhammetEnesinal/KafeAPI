@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KafeAPI.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/orderitem")]
     [ApiController]
     public class OrderItemsController : BaseController
     {
