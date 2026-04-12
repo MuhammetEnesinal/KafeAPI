@@ -17,7 +17,7 @@ namespace KafeAPI.API.Controllers
             _authService = authService;
         }
 
-        [HttpPost("GenerateToken")]
+        [HttpPost]
         public async Task<IActionResult> GenerateToken(LoginDto dto)
         {
             var result = await _authService.GenerateToken(dto);

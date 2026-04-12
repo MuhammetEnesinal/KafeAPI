@@ -13,7 +13,10 @@ namespace KafeAPI.API.Controllers
     {
         private readonly IUserServices _userServices;
 
-
+        public UsersController(IUserServices userServices)
+        {
+            _userServices = userServices;
+        }
         [HttpPost]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
@@ -30,9 +33,17 @@ namespace KafeAPI.API.Controllers
         }
         [Authorize(Roles = "admin,employe")]
         [HttpPost("addrole")]
-        public async Task<IActionResult> AddRoleToUser(string email,string roleName)
+        public async Task<IActionResult> AddRoleToUser(string email, string roleName)
         {
-            var result = await _userServices.AddToRole(email,roleName);
+            var result = await _userServices.AddToRole(email, roleName);
+            return CreateResponse(result);
+        }
+
+
+        [HttpPost("registerDefault ")]
+        public async Task<IActionResult> RegisterDefault(RegisterDto dto)
+        {
+            var result = await _userServices.RegisterDefault(dto);
             return CreateResponse(result);
         }
     }

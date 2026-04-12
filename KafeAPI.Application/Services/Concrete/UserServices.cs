@@ -91,5 +91,44 @@ namespace KafeAPI.Application.Services.Concrete
 
 
         }
+
+        public async Task<ResponseDto<object>> RegisterDefault(RegisterDto dto)
+        {
+            try
+            {
+                var validate = await _registerValidator.ValidateAsync(dto);
+                if (!validate.IsValid)
+                {
+                    return new ResponseDto<object> { Success = false, Data = null, Message = validate.Errors.FirstOrDefault().ErrorMessage, ErrorCode = ErrorCodes.ValidationError };
+
+                }
+                var result = await _userRepository.RegisterAsync(dto);
+                if (result.Succeeded)
+                {
+                    var roleResult =await _userRepository.AddRoleToUserAsync(dto.Email, "user");
+                    if (roleResult)
+                    {
+                        return new ResponseDto<object> { Success = true, Data = null, Message = "Kayıt Başarılı.", ErrorCode = null };
+
+                    }
+                    else
+                    {
+                        return new ResponseDto<object> { Success = false, Data = null, Message = "Kullanıcı oluşturuldu rol ataması yaparken hata oluştu", ErrorCode = ErrorCodes.BadRequest };
+
+                    }
+
+                }
+                else
+                {
+                    return new ResponseDto<object> { Success = false, Data = null, Message = result.Errors.FirstOrDefault().Description };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDto<object> { Success = false, Data = null, Message = "Bir Hata oluştu.", ErrorCode = ErrorCodes.Exception };
+            }
+
+        }
     }
 }

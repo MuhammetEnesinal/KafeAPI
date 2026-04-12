@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using FluentValidation;
 using KafeAPI.Application.Dtos.CategoryDtos;
 using KafeAPI.Application.Dtos.MenuItemDtos;
@@ -146,7 +147,80 @@ Log.Logger = new LoggerConfiguration()
 builder.Services.AddSingleton<Serilog.ILogger>(Log.Logger);
 builder.Host.UseSerilog();
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(
+builder.Configuration.GetSection("IpRateLimiting"));
+
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
+
+
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var roleManager = services.GetRequiredService<RoleManager<AppIdentityRole>>();
+        var userManager = services.GetRequiredService<UserManager<AppIdentityUser>>();
+
+        string roleName = "admin";
+
+        // 1. Rolü Kontrol Et ve Yoksa Oluþtur
+        if (!await roleManager.RoleExistsAsync(roleName))
+        {
+            var roleResult = await roleManager.CreateAsync(new AppIdentityRole { Name = roleName });
+            if (!roleResult.Succeeded)
+            {
+                Console.WriteLine("!!! DÝKKAT: Rol oluþturulamadý !!!");
+                foreach (var err in roleResult.Errors) Console.WriteLine($"- {err.Description}");
+            }
+        }
+
+        // 2. Admin Kullanýcýsýný Kontrol Et ve Yoksa Oluþtur
+        string adminEmail = "admin@kafeapi.com";
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+        if (adminUser == null)
+        {
+            adminUser = new AppIdentityUser
+            {
+                UserName = "admin",
+                Email = adminEmail,
+                Name = "System",     
+                Surname = "Admin"     
+            };
+
+            var createResult = await userManager.CreateAsync(adminUser, "admin123");
+
+            if (createResult.Succeeded)
+            {
+                await userManager.AddToRoleAsync(adminUser, roleName);
+                Console.WriteLine(">>> BAÞARILI: Admin kullanýcýsý ve rolü eklendi! <<<");
+            }
+            else
+            {
+                Console.WriteLine("!!! DÝKKAT: Kullanýcý oluþturulamadý. Sebepleri: !!!");
+                foreach (var error in createResult.Errors)
+                {
+                    Console.WriteLine($"HATA DETAYI: {error.Code} - {error.Description}");
+                }
+            }
+        }
+        else
+        {
+            Console.WriteLine(">>> BÝLGÝ: Admin kullanýcýsý zaten veritabanýnda mevcut. <<<");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"!!! KRÝTÝK HATA !!! Seed Data çalýþýrken uygulama patladý: {ex.Message}");
+    }
+}
 
 
 
@@ -164,6 +238,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
+app.UseIpRateLimiting();
 app.UseHttpsRedirection();
 
 
