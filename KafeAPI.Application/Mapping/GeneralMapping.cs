@@ -3,6 +3,7 @@ using KafeAPI.Application.Dtos.CafeInfoDtos;
 using KafeAPI.Application.Dtos.CategoryDtos;
 using KafeAPI.Application.Dtos.MenuItemDtos;
 using KafeAPI.Application.Dtos.OrderDtos;
+using KafeAPI.Application.Dtos.ReviewDtos;
 using KafeAPI.Application.Dtos.TableDtos;
 using KafeAPI.Application.Dtos.UserDto;
 using KafeAPI.Domain.Entities;
@@ -53,6 +54,11 @@ namespace KafeAPI.Application.Mapping
             CreateMap<CafeInfo, ResultCafeInfoDto>().ReverseMap();
             CreateMap<CafeInfo, UpdateCafeInfoDto>().ReverseMap();
             CreateMap<CafeInfo, DetailCafeInfoDto>().ReverseMap();
+
+            CreateMap<Review, CreateReviewDto>().ReverseMap();
+            CreateMap<Review, ResultReviewDto>().ReverseMap();
+            CreateMap<Review, UpdateReviewDto>().ReverseMap();
+            CreateMap<Review, DetailReviewDto>().ReverseMap();  
 
         }
     }
